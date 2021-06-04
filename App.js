@@ -1,4 +1,4 @@
-//50:00
+//01:50:00
 
 import {StatusBar} from 'expo-status-bar'
 import {View,Text} from 'react-native' 
@@ -7,10 +7,20 @@ import { createStackNavigator } from '@react-navigation/stack'
 import React,{Component} from 'react'
 import LandingScreen from './components/auth/Landing'
 import RegisterScreen from './components/auth/Register'
+import MainScreen from './components/Main'
+import {Provider} from 'react-redux'
+import {createStore,applyMiddleware} from 'redux'
+import rootReducer from './redux/reducers'
+import thunk from 'redux-thunk'
+import AddScreen from './components/main/Add'
+
 
 import firebase from 'firebase'
 import Register from './components/auth/Register'
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+const store = createStore(rootReducer,applyMiddleware(thunk))
+
 const firebaseConfig = {
   apiKey: "AIzaSyA0VL2S7Gr7TbFU57O33kmn2nW1aiNFlRw",
   authDomain: "instagram-clone-e3168.firebaseapp.com",
@@ -36,8 +46,8 @@ export class App extends Component {
   }
   componentDidMount()
   {
-    firebase.auth().onAuthStateChanged((user)=>{
-      if(!user)
+    firebase.auth().onAuthStateChanged((users)=>{
+      if(!users)
       {
         this.setState({
           loggedIn: false,
@@ -79,9 +89,14 @@ export class App extends Component {
 }
 else{
   return(
-    <View style={{flex: 1,justifyContent: 'center'} }>
-      <Text> User is logged in</Text>
-    </View>
+    <Provider store={store}>
+      <NavigationContainer>
+           <Stack.Navigator initialRouteName = "Main">
+        <Stack.Screen name = "Main" component ={MainScreen} options ={{headerShown:false}}/>
+        <Stack.Screen name = "Add" component ={AddScreen}/>
+      </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   )
 
 }
